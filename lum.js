@@ -53,14 +53,30 @@ function new_getInput(event) {
             console.log(new_arg)
             }
             regexPrint(req, new_arg)
-            //Print(req, new_arg)
         }
         if (userInput.split(" ").length == 1) { // if no arg
             req = setUp(event, "keys")
-            Print(req, userInput); 
+            regexPrint(req, userInput); 
         }
     }
+    if (event.keyCode == 9) { // left tab
+        document.getElementById("myinput").scrollIntoView();
+    }
+    if (event.keyCode == 16) { //left shift
+        console.log("left shift")
+        removeChildren()
+    }
 }
+
+function removeChildren() {
+    for (x = 0; x < document.getElementById("output").childNodes.length; x++) { 
+        document.getElementById("output").removeChild(document.getElementById("output").childNodes[x])
+    }
+    if ( document.getElementById("output").childNodes.length > 0) { 
+        removeChildren()
+    }
+}
+
 
 function regexPrint(file, input) { 
     var count = 0
@@ -71,7 +87,7 @@ function regexPrint(file, input) {
 	values = file.responseText.match(query);
 
     for (var x = 0; x < values.length; x++) {
-        sent = out.appendChild(document.createTextNode(values[x]));
+        out.appendChild(document.createTextNode(values[x]));
         if (values[x] != "") { 
             out.appendChild(document.createElement("br"));
             out.appendChild(document.createElement("br"));
@@ -83,26 +99,6 @@ function regexPrint(file, input) {
 }
 
 
-function Print(file, input) { 
-    count = 0;
-    sent = []
-    split_sent = []
-    list_of_entries = file.responseText.split("\n")
-    var para = document.createElement("P");           // Create a <p> element
-    var out = document.getElementById("output");
-    for (var i = 0; i < list_of_entries.length; i++) {
-        if (list_of_entries[i].toUpperCase().includes(input.toUpperCase())) {
-            sent = out.appendChild(document.createTextNode(list_of_entries[i]));
-		    out.appendChild(document.createElement("br"));
-		    out.appendChild(document.createElement("br"));
-            count ++;
-        }
-
-    }
-    out.appendChild(document.createTextNode(count));    
-    //out.appendChild(document.createTextNode("<a href=\"#top\">top</a>"))
-
-} 
 
 function Parser(userInput) {  
     if ((userInput.split(" ").length) > 1 ) { // 2+ args
@@ -117,4 +113,17 @@ function Parser(userInput) {
 } 
 
 
-  document.getElementById("myinput").addEventListener("keyup", new_getInput);
+  
+window.addEventListener('keydown', function (event) { //removes tabs previous functionality
+    if (event.keyCode === 9) { //left tab
+        event.preventDefault();
+        return false;
+    }
+    if (event.keyCode === 16) { //left shift?
+        event.preventDefault();
+        return false;
+    }
+});
+
+    //document.getElementById("myinput").addEventListener("keyup", new_getInput); 
+  addEventListener("keyup", new_getInput);
