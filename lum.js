@@ -1,8 +1,9 @@
+
 function check_address(filename, req) { 
     address = String(window.location.pathname)
-    if (address == "/home/oem/Documents/Code/lum.html") { // LOCAL
+    if (address == "/home/oem/Documents/Code/lum.html") { console.log("LOCAL");
         return filename
-    } else { // ONLINE
+    } else { console.log("ONLINE");    
         newfilename = "https://raw.githubusercontent.com/integralyogin/data-for-lum/master/"+filename
         return newfilename
     }
@@ -26,6 +27,11 @@ function process(text) {
 }
 
 
+function auth_list(event) { 
+    setUp(event, "keys")
+}
+
+
 function Parser(userInput) {  
     if ((userInput.split(" ").length) > 1) { return userInput.split(" "); }
     if ((userInput.split(" ").length) < 2) { return userInput; }
@@ -33,10 +39,13 @@ function Parser(userInput) {
 
 
 function newParser(userInput, event) { 
-    list_of_dbs = ["keys", "arex", "QQ", "gloss", "san", "iye", "aqal", "occ","auth", "cats", "syn"]
+    list_of_dbs = ["keys", "arex", "QQ", "gloss", "san", "iye", "aqal", "occ","auth", "cats", "syn", "jbkeys", "todo"]
+    list_of_special_commands = ["process auth"]
+
+    userInput = userInput.toLowerCase();
     userInput = Parser(userInput)
     db = "keys"
-    for (x = 0; x < list_of_dbs.length; x++) { // CLEAN DB_ARG IF ONE EXISTS
+    for (x = 0; x < list_of_dbs.length; x++) { // check for DB and CLEAN ARG IF ONE EXISTS
         if (userInput[0] == list_of_dbs[x]) { 
             db = list_of_dbs[x]; 
             userInput = userInput.splice(1);
@@ -61,21 +70,30 @@ function prePrint(event, db, userInput) {
     regexPrint(req, userInput)
 }
 
+function consoleInfo(text) {
+    console.log("consoleInfo()")    
+    console.log("text:")
+    console.log(text)
+}
+
 function getInput(event) {
     userInput = document.getElementById("myinput").value;
-    document.getElementById("myinput").focus();
+
 
     if (event.keyCode == 13) { // ENTER KEYPRESS
+        consoleInfo(userInput)
         arguments = newParser(userInput, event)
     }
-    if (event.keyCode == 9) {       // LEFT TAB KEYPRESS
+    if (event.keyCode == 9) {       // TAB KEYPRESS
         document.getElementById("myinput").scrollIntoView();
         document.getElementById("myinput").focus(); 
     }
     if (event.keyCode == 16) {      // LEFT SHIFT KEYPRESS
         removeChildren()
     }
-
+    if (event.keyCode == 36) { // or 33 (home keypress, pgup)
+        console.log("home")
+    }
 }
 
 
@@ -107,7 +125,7 @@ function regexPrint(file, input) {
 
 
 
-window.addEventListener('keydown', function (event) { // disables some keys
+window.addEventListener('keyup', function (event) { // disables some keys
     if (event.keyCode === 9) { //left tab
         event.preventDefault();
         return false;
@@ -116,8 +134,21 @@ window.addEventListener('keydown', function (event) { // disables some keys
         event.preventDefault();
         return false;
     }
+    if (event.keyCode === 36) { //home
+        active = document.activeElement.tagName
+        if (active == "INPUT") { 
+            console.log("INPUT ACTIVE:")
+            console.log(active)
+        } 
+        if (active == "home") {
+            console.log("home ACTIVE")
+            console.log(active)
+            scroll(0,0)
+            //event.preventDefault();
+            //return false;
+        }
+    }
 });
 
     //document.getElementById("myinput").addEventListener("keyup", getInput); 
   addEventListener("keyup", getInput);
-
