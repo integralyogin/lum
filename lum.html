@@ -1,0 +1,177 @@
+<!--  -->
+<!DOCTYPE html>
+<html>
+<body>
+<div id="output"></div>
+<p>
+	<b>L U M - Luminous Searchable Database</b><br><br>
+<input type="text" id="myinput" autofocus="on"><br><br>
+
+<b>Quickstart:<br></b>
+    Type in any:<br>
+    <p class="tab">Persons Name ..... (ex: Sri Aurobindo, Aleister Crowley, The Mother, Albert Einstein) ("cats auth" for a list of authors)<br>
+    Subject Name ..... (ex: #physics, #occultism, #zen, #sufi #poetry)<br>
+    Book Name ..... (ex: The Synthesis of Yoga, Savitri, Liber ABA, The Life Divine, Words of the Mother, Prayers and Meditations, Liber Null, The Bible)<br>
+    Noun ..... (ex: God, Ignorance, Knowledge, Light, the Path, She, The Aim)<br>
+    Verb ..... (ex: offer, meditate, play, realize, remember, concentrate, pray, dance, sacrifice, surrender) ("cats verbs" for a list of verbs)<br>
+    Interrogatives ..... (ex. who, what, where, when, why, how, whence, whether, whither)<br>
+    String/Bigram ..... (ex: a cry came, eternal lotus, divine response, God is)<br>
+    Symbol ..... (ex: :, !, >, \? )<br>
+    Other Databases ..... (ex: cats auth, gloss ^a, occ ^s, auth Sri Aurobindo)<br>
+    Syntax ..... (ex: "man " or man\s (so as to find "man " but not "many")<br>
+    Regex ..... (ex: Sri Aurobindo.*The Mother or ^"what) (<a href="#regex">regex cheatsheet & examples</a>)<br>
+    All ..... (pressing enter with no input shows all quotes from keys)<br>
+    (then press enter to search through the keys quotes database.)<br>
+</p>
+<p>
+     <br>
+    further examples are given <a href="#exa">below</a><br>
+    all categories can be found with "cats :::" (like Authors sorted by Subject)<br>
+    <br>
+    <u>Special Keys</u><br>
+    [left tab]: focuses in on the input element, which means its ready for you to type<br>
+    [left shift]: removes all previously printed results<br>
+    note also: enter can be pressed from anywhere, even when the element isnt selected<br>
+    <br>
+    <u>Databases Info:</u><br>
+    Alternatively, you can search other databases by starting the query with its name. (ex "gloss brahman" or "cats names").<br>
+    There are three main types of Databases: Quotes, Glossaries, and Other.<br>
+    They are described next.<br>
+    <br>
+
+<b>Quotes:</b><br>
+    keys ..... (main quotes database) (2600 Quotes ~)<br>
+    QQ ..... ("quality" quotations) (1493 Quotes ~)<br>
+    arex ..... (Agarwal & Richards) (10398 Quotes ~)<br>
+<br>
+
+<b>Glossaries:</b><br>
+    gloss ..... (Sanskrit glossary from Record of Yoga) (3156 terms ~)<br>
+    san ..... (Sanskrit glossary from SABCL) (3140 terms :::)<br>
+    iye ..... (Glossary of English Terms in Integral Yoga Literature) (<a href="http://www.miraura.org/lit/engl.html">miraura.org</a>) (147 terms :::)<br>
+    aqal ..... (AQAL glossary (Matt Rentschler's)) (175 terms :::)<br>
+    occ ..... (Occult glossary (Gottfried de Purucker's)) (252 terms :::)<br>
+<br>
+
+<b>Other:</b><br>
+    cats ..... (categories_main) (:::)<br>
+    syn ..... (synonyms) (:::)<br>
+    auth ..... (authors) (:::)<br>
+<br>
+
+<div id="exa">
+<a name="exa"></a>
+<p>
+<b>Search Examples:</b> (and descriptions)<br>
+    <i>~ try one ~ </i>(TAB goes back to the input box)<br>
+    my God is<br>
+    why is<br>
+    keys God<br>
+    keys Sri Aurobindo<br>
+    keys sunlit path<br>
+    keys suffering<br>
+    keys prayer<br>
+    keys meditation<br>
+    keys #physics<br>
+    keys #occultism (all quotes with occultism tag)<br>
+    keys The Mother.*~ Sri Aurobindo (what Sri Aurobindo says about the Mother)<br>
+    keys ~ (shows all quotes from keys)<br>
+    gloss Savitri<br>
+    cats auth (for a list of authors which one can then search for)<br>
+    cats terms (for a list of some search terms)<br>
+    cats names (for lists of authors sorted by subject)<br>
+    auth Norbert Weiner<br>
+    cats ::: (shows all listed categories)<br>
+    iye ::: (shows all entries)<br>
+    san ::: (shows all definitions in san)<br>
+<br>
+
+<b>Notes & Commands:<br></b>
+    supports regular expressions, and is case insensitive<br>
+    the word bubble below can give some hints as to possible search terms<br>
+    typing in only one word should auto search keys<br>
+    pressing "left tab", should automatically focus in on the input element, which means its ready for you to type<br>
+    and enter can be pressed from anywhere, even when the element isnt selected<br>
+    pressing "left shift", should remove all previously printed results, and focus on input<br>
+    <br>
+
+<u>About:</u><br>
+    This program is a means for searching through some 15000 quotes and short of 7000 definitions.<br>
+    All of "keys" has been hand picked.<br>
+    <br>
+
+<u>Local Options:</u><br>
+    arex(should be local)<br>
+    vsbuff TERMS (88 ~)<br>
+    jbkeys<br>
+    todo<br>
+    <br>
+
+<u>Links</u><br>
+    <a href="https://github.com/integralyogin/lum/">github lum.js</a><br>
+    <a href="https://github.com/integralyogin/data-for-lum/">github data-for-lum</a><br>
+<br>
+
+<u>Why</u><br>
+    +intent
+
+<br>
+
+<div id="regex">
+<a name="regex"></a>
+<p>
+<b>Regular Expressions Cheatsheet:</b><br>
+<p class="tab">
+ 	abc... 	 ..... Letters<br>
+	123... 	 ..... Digits<br>
+	\d 		 ..... Any Digit<br>
+	\D 		 ..... Any Non-digit character<br>
+	. 		 ..... Any Character<br>
+	\. 		 ..... Period<br>
+	[abc] 	 ..... Only a, b, or c<br>
+	[^abc] 	 ..... Not a, b, nor c<br>
+	[a-z] 	 ..... Characters a to z<br>
+	[0-9] 	 ..... Numbers 0 to 9<br>
+	\w 		 ..... Any Alphanumeric character<br>
+	\W 		 ..... Any Non-alphanumeric character<br>
+	{m} 	 ..... m Repetitions<br>
+	{m,n} 	 ..... m to n Repetitions<br>
+	* 		 ..... Zero or more repetitions<br>
+	+ 		 ..... One or more repetitions<br>
+	? 		 ..... Optional character<br>
+	\s 		 ..... Any Whitespace<br>
+	\S 		 ..... Any Non-whitespace character<br>
+	^...$ 	 ..... Starts and ends<br>
+	(...) 	 ..... Capture Group<br>
+	(a(bc))  ..... Capture Sub-group<br>
+	(.*) 	 ..... Capture all<br>
+	(abc|def) 	 ..... Matches abc or def<br>
+    <br></p><p>
+    <u>Regex Examples & Favorites</u><br>
+    She\s.*~ Sri Aurobindo ..... (lines containing "she " (ie not words like shell) by "Sri Aurobindo" in keys)<br>
+    suffering.*Mother ..... (what The Mother says about suffering)<br>
+    ^(?=.*Aurobindo)(?=.*God).* ..... (contains Aurobindo and God at some point)<br>
+    ^(?=.*~ Sri Aurobindo)(?=.*Aurobindo.*~).* ..... (Sri Aurobindo speaking of Sri Aurobindo)<br>
+    ^(?=.*~ The Mother)(?=.*Mother.*~)(?!.*>).* ..... (The Mother talking about The Mother but not containing ">" (which indicates a conversation))<br>
+    ^(?!.*a).* ..... (does not contain the letter a)<br>
+    ^(?=.*God)(?!.*Aurobindo).* ..... (contains God but not Aurobindo)<br>
+    gloss ^s ..... (lines in gloss that start with s or S)<br>
+    ^((?!a).)*$ ..... (lines without the letter "a" from keys) (<a href="https://www.regextester.com/15">regextester.com/15</a>)<br>
+    <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">regex tutorial</a><br>
+    <br>
+
+<br></p>
+
+<script type="text/javascript" src="lum.js"></script>
+</script>
+
+
+  </body>
+  </html>
+
+
+<style type="text/css">
+<!--
+.tab { margin-left: 40px; }
+-->
+</style>
