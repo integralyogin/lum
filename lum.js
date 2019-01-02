@@ -1,4 +1,3 @@
-
 function check_address(filename, req) { 
     address = String(window.location.pathname)
     if (address == "/home/oem/Documents/Code/lum.html") { console.log("LOCAL");
@@ -67,7 +66,7 @@ function newParser(userInput, event) {
 
 function prePrint(event, db, userInput) {
     req = setUp(event, db)
-    regexPrint(req, userInput)
+    regexPrint(req, userInput, db)
 }
 
 function consoleInfo(text) {
@@ -107,17 +106,22 @@ function removeChildren() {
 }
 
 
-function regexPrint(file, input) { 
+function regexPrint(file, input, db) { 
     var count = 0
     var query = new RegExp(".*"+input+".*", "gim");
 	values = file.responseText.match(query);
 
     for (var x = 0; x < values.length; x++) {
-        document.getElementById("output").appendChild(document.createTextNode(values[x]));
-        if (values[x] != "") { 
+        //document.getElementById("output").appendChild(document.createTextNode(values[x]));
+        document.getElementById("output").innerHTML += values[x];
+        if (db != "todo" && values[x] != "") { 
             document.getElementById("output").appendChild(document.createElement("br"));
             document.getElementById("output").appendChild(document.createElement("br"));
         }
+        if (db == "todo" && values[x] != "") {
+            document.getElementById("output").appendChild(document.createElement("br"));
+        }
+
         count++;
     }
     document.getElementById("output").appendChild(document.createTextNode(count));
