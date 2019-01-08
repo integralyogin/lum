@@ -1,4 +1,5 @@
-    filebucket = []
+
+    filebucket = []         //file gets loaded into this array
     authbucket = []
     savitri_list = []
     db = ""
@@ -116,8 +117,8 @@ function regexPrint(file, input, db) {
     savitri_list = []
     for (var x = 0; x < values.length; x++) {
         if (values[x].includes(", Savitri")) { // QUERY FOR SAVITRI?
-            console.log("regexPrint: db != 33-34Savitri")
-            console.log(sav_index.length+"sav_index||savitri_list"+savitri_list.length)
+            //console.log("regexPrint: db != 33-34Savitri")
+            //console.log(sav_index.length+"sav_index||savitri_list"+savitri_list.length)
             document.getElementById("output").innerHTML += values[x]+" "+"[!"+sav_index+"]";
             savitri_list.push(values[x]);
             sav_index ++
@@ -164,11 +165,12 @@ function sectionalPrint(file, input, db) {
 }
 
 function authCount(event, db, moreCountsThen) {         // AC
+    console.log(document)
     file = setUp(db)
     quickListAFile(file, ".")
     r = 0
 
-    for (x = r; x < filebucket.length; x++) { 
+    for (x = r; x < filebucket.length; x++) {           // FILL FILEBUCKET
         i = filebucket[x].indexOf("~")
         comma = filebucket[x].indexOf(",")
         relative_comma = filebucket[x].slice(i, filebucket[x].length).indexOf(",")
@@ -179,21 +181,21 @@ function authCount(event, db, moreCountsThen) {         // AC
         the_cut = filebucket[x].slice(i+2, Math.min(filebucket[x].length-1, relative_comma+i, tag))
         the_cut = the_cut.trim()
         authbucket.push(the_cut);
+        if (x < 3) { console.log("(n authCount) x:authbucket[x]:filebucket[x] >>> "+x+":"+authbucket[x]+":"+filebucket[x]); }    //>>> 2:Socrates:"Be as you wish to seem. ~ Socrates"
     } superArray = superCount(authbucket)
-
-    for (x = 0; x < authbucket.length; x++) {
+    for (x = 0; x < authbucket.length; x++) {           // MAKE DIV OF SUPERARRAY
         if (superArray[1][x] > moreCountsThen) {
             //document.getElementById("output").appendChild(document.createTextNode(superArray[0][x]+" :: "+superArray[1][x]));
             //document.getElementById("output").appendChild(document.createElement("br"));
             //document.getElementById("output").appendChild(document.createTextNode());
             makeDiv(superArray[0][x]+"</b>: ("+superArray[1][x]+")", x)
             //console.log("authbucket.length "+authbucket.length+authbucket[x])
-        }
-    } //window.stop();
+        } 
+    }  //window.stop();
 }
 function makeDiv(auth, x) {
     var div = document.createElement("div"+x);
-    console.log("f makeDiv: x/auth: "+x+"::"+auth)  // 19: camus
+    if (x < 25) { console.log("(n makeDiv) x/auth >>> "+x+"::"+auth) }      //>>> 19::Albert Camus</b>: (8)
     div.innerHTML = '<div id="demo" onmouseup="mouseClick('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+' (+<span id="demo'+x+'"></span>)</p></div>'
     document.getElementById("output").appendChild(div);
 }
@@ -202,34 +204,35 @@ function mouseClick(x) {
     wikit = setUp("wikiauthors")
     var node = document.getElementById('demo')
     textContent = node.childNodes[0].innerHTML
+
     text_length = textContent.length
     var query = new RegExp("^"+""+".*", "img");
     entry = (wikit.responseText.match(query, "img"));
     authName = textContent.slice(1, text_length-4)
 
-    console.log("f mouseClick: node.attributes.length: "+node.attributes.length) 
-    console.log("f mouseClick: node.attributes.name: "+node.attributes[1].name)
-    console.log("f mouseClick: node.childNodes: "+node.childNodes)  //>>> [object NodeList]
-    console.log("f mouseClick: node.childNodes[0]: "+node.childNodes[0]) //>>> [object HTMLParagraphElement]
-    console.log("f mouseClick: node.childElementCount: "+node.childElementCount) //>>> 1
-    console.log("f mouseClick: node.childNodes[0]: "+node.childNodes[0].innerHTML)  //>>> <b>?</b> (<span id="demo5"></span>)
-    console.log("f mouseClick: entry.length/wikit.length: "+entry.length+"/"+wikit.length) //860
-    console.log("f mouseClick: x: "+x)    //>>> 19 (on camus)
-    console.log("f mouseClick: node: "+node)
-    console.log("f mouseClick: textContent: "+textContent)  //>>> textContent: <b>?</b> (<span id="demo5"></span>)
-    console.log("f mouseClick: authName ::: "+authName)  //>>> f mouseClick: authName ::: b>?</b> (<span id="demo5"></sp
-    //for (x=0; x < node.attributes.length; x++) { console.log("f mouseClick: node.attributes[x]: "+node.attributes[x]) }
-
-    for (var i = 0; i < entry.length; i++) {
+    //for (x=0; x < node.attributes.length; x++) { console.log("(n mouseClick): node.attributes[x]: "+node.attributes[x]) }
+    auth = ""
+    for (var i = 0; i < document.all.namedItem("demo").length; i++) {  //860 entries
         if (authName != "") {
-            //console.log("f mouseClick: i/entry[i]: "+i+"/"+entry[i]) //prints out 800 things.. i=19 = crowley
-            if (entry[i].includes("Aleister Crowley")) {
-                //console.log("authName :"+authName)
-                //console.log("match "+entry[i])
-                //console.log(entry[i])
-            }
+            if (document.all.namedItem("demo")[i].innerHTML.includes('"demo'+x+'"')) {
+                //console.log(document.all.namedItem("demo")[i].innerText.split(":")[0])
+                auth = String(document.all.namedItem("demo")[i].innerText.split(":")[0])
+                console.log("in: auth: "+auth)
+                
+            } 
         }
-    } document.getElementById("demo"+x).appendChild(document.createTextNode("values"+x+": "+entry[x]));
+    }  
+//    console.log("out: auth: "+auth)
+    for (i = 0; i < entry.length; i++) {
+        if (entry[i].indexOf(auth) == 0) {
+            console.log("i/entry[i]: "+i+"/"+entry[i])
+            r = i
+        }
+    }  soMuchInfo()
+
+
+   document.getElementById("demo"+x).appendChild(document.createTextNode(entry[r]));
+   r = ""
 }
 
 
@@ -237,6 +240,37 @@ function quickListAFile(file, input) { // (file, ".", db)
     var query = new RegExp(".*"+input+".*", "gim");
     values = file.responseText.match(query);
     for (var x = 0; x < values.length; x++) { filebucket.push(values[x]); }
+}
+
+
+function soMuchInfo(x) {
+    n = "soMuchInfo("+x+"): "
+    //console.log(document.all)
+    console.log("soMuchInfo: document.all.namedItem('demo'): "+document.all.namedItem("demo"))  //>>> [object HTMLCollection]
+    console.log("soMuchInfo: document.all.namedItem('demo').length: "+document.all.namedItem("demo").length)  // 86
+    console.log("soMuchInfo: document.all.namedItem('demo')[1]: "+document.all.namedItem("demo")[1]) // [object HTMLDivElement]
+    console.log("soMuchInfo: document.all.namedItem('demo')[1]: "+document.all.namedItem("demo")[1])
+    console.log("soMuchInfo: document.all.namedItem('demo')[1].attributes[1].value.includes('19')): "+document.all.namedItem("demo")[1].attributes[1].value.includes("19")) // true
+    console.log("soMuchInfo: document.all.namedItem('demo')[1].innerText: "+document.all.namedItem("demo")[1].innerHTML)  // Albert Camus: (8) (+) //.split(":")[0]
+    console.log("soMuchInfo: document.all.namedItem('demo')[1].innerText: "+document.all.namedItem("demo")[1].innerHTML.includes("demo"+19))
+    console.log("soMuchInfo: document.all.namedItem('demo')[2].innerText: "+document.all.namedItem("demo")[2].innerText)  // Albert Einstein: (30) (+)
+
+    for (x = 0; x < entry.length; x++) { if (entry[x].includes("Camus")) { console.log("soMuchInfo: (entry[x].includes('Camus'): x: "+x) }} //  14
+
+    console.log("authbucket.length: "+authbucket.length) 
+    console.log("authbucket[19]: "+authbucket[1]) 
+   // term = ""
+ //   for (x = 0; x < 100; x++) { term += authbucket[x]; console.log("term: "+term) }
+
+    //console.log("soMuchInfo: entry[19]: "+entry[19])  // CROWLEYS WIKI
+    //console.log(n+document.getElementsByTagName("BODY").attributes.length)
+
+   // if (document.all.namedItem("demo")[1].attributes[1].value.includes("19")) { console.log("BINGO MF") }
+//    for (x = 0; x < document.all.namedItem("demo").length; x++) { console.log(document.all.namedItem("demo")[0]) }
+    //console.log(document.all.namedItem("demo").attributes[1].value)
+//    console.log(document.getElementById('demo').attributes.length)    
+    //console.log(document.getElementById('demo').attributes[1].value)
+    //console.log(window)
 }
 
 
@@ -258,3 +292,6 @@ function superCount(arr) {
     prev = arr[i];
     } return [a, b]; 
 }
+
+
+document.getElementById("endofhtml").innerHTML = "lastModified: "+document.lastModified
