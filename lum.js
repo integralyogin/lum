@@ -1,65 +1,21 @@
-<script>
+wikit_list = []
+filebucket = []
+authbucket = []
+savitri_list = []
+db = ""
+addEventListener("keyup", getInput); // document.getElementById("myinput").addEventListener("keyup", authCount); 
 
 
-function mouseOn(x) {
-    // check wikiauthors for author name
-    wikit = setUp("wikiauthors")
-    //input = "Sri Aurobindo"
-    var node = document.getElementById('demo')
-    var node2 = document.getElementById('output')
-    //node2 = node.getChild(getElementById('demo'+x))
-    console.log("node: "+node)
-    console.log("node2: "+node2)
-    textContent1 = node.childNodes[0].innerHTML
-    textContent2 = node2.childNodes[0].innerHTML
-    //var resBox=document.getElementById('demo'+x);
-    //var strTrans=resBox.getElementsByTagName('span').textContent
-    //console.log("strTrans: "+strTrans)
-    //
-    console.log("textContent1: "+textContent1)
-    console.log("textContent2: "+textContent2)
-    text_length = textContent1.length
-    authName = textContent1.slice(1, text_length-4)
-    console.log("authName ::: "+authName)
-    authName = ""
-
-    //console.log("documents.getelement "+document.getElementById('output').getChild(document.getElementById('demo')))
-    //ele = document.getElementById('output')
-    //ele = ele.getElementById('demo').textContent
-    //ele = document.getElementById('demo'+x).textContent
-   // console.log("ele: "+ele)
-    
-
-
-    //document.getElementById("demo2").appendChild(document.createTextNode(authName));
-    var query = new RegExp("^"+authName+".*", "img");
-    entry = (wikit.responseText.match(query));
-    //savitri_list.push(values[x]);
-
-
-    for (var i = 0; i < entry.length; i++) {
-        if (authName != "") {
-            if (entry[i].includes(authName)) {
-                console.log("authName :"+authName)
-                console.log("match "+entry[i])
-                x = i
-            }
-        }
+window.addEventListener('keyup', function (event) { // disables some keys
+    if (event.keyCode === 9) { event.preventDefault(); return false; }      // left tab
+    if (event.keyCode === 16) { event.preventDefault(); return false; }     // left shift
+    if (event.keyCode === 36) { //home
+        active = document.activeElement.tagName
+        if (active == "INPUT") { console.log("addEventListener: INPUT: "+active) } 
+        if (active == "home") { console.log("addEventListener: home: "+active); scroll(0,0) }
     }
-
-    document.getElementById("demo"+x).appendChild(document.createTextNode("values"+x+": "+entry[x]));
-    //console.log("mouseOn: entry[x]: "+entry[x])
-    //console.log(entry)
-    
-}
-
-function mouseOff(x) { 
-    new_removeChildren("demo"+x) 
-    //var x = document.getElementById("demo");    
-    //x.style.color = "black";
-    //var z = document.getElementById("demo2");  
-    //document.getElementById("demo2").appendChild(document.createTextNode("+"));
-}
+});
+   
 
 function check_address(filename, req) { 
     console.log("check_address: filename: ", filename)
@@ -72,13 +28,9 @@ function check_address(filename, req) {
         if (filename.includes('fulldatabase')) {
             newfilename = "https://gitlab.com/integralyogin/fulldatabase/blob/master/"+filename
             newfilename = "https://gitlab.com/integralyogin/fulldatabase/raw/0f997955e3a092d8062556eb0e4658e291ff43bf/"+filename
-        }
-        return newfilename
+        } return newfilename
     }
-
-// https://gitlab.com/integralyogin/fulldatabase/blob/master/fulldatabase
 }
-
 
 function consoleInfo(text) {
     console.log("consoleInfo(): \""+text+"\"")
@@ -113,16 +65,11 @@ function getInput(event) {
             removeChildren()
             indexNum = userInput.slice(1)
             target = savitri_list[indexNum] // = savitri passage
-            //stem = savitri_list[remains].split("\~")
-            //console.log("STEM: "+stem)
-            //document.getElementById("output").innerHTML += savitri_list[indexNum]
             console.log("getInput: savitri_list[indexNum]: "+savitri_list[indexNum])
-            //console.log("savitri_list[indexNum]).indexOf(\"<br>\"): "+savitri_list[indexNum].indexOf("<br>"));
             brIndex = savitri_list[indexNum].indexOf("<br>")
             stem = savitri_list[indexNum].slice(1,brIndex)
             console.log("getInput: STEM: "+stem)
             file = setUp("33-34Savitri")
-            //console.log("getInput: DB: "+db)
             sectionalPrint(file, stem, "33-34Savitri")
         }
         arguments = newParser(userInput, event)
@@ -134,12 +81,8 @@ function getInput(event) {
         document.getElementById("myinput").focus(); 
         scroll(0,0)
     }
-    if (event.keyCode == 20) {      // LEFT SHIFT KEYPRESS (16) && CAPS (20)
-        removeChildren()
-    }
-    if (event.keyCode == 36) { // or 33 (home keypress, pgup)
-        console.log("home")
-    }
+    if (event.keyCode == 20) { removeChildren() } // LEFT SHIFT KEYPRESS (16) && CAPS (20)
+    if (event.keyCode == 36) { console.log("home") } // or 33 (home keypress, pgup)
 }
 
 
@@ -150,8 +93,7 @@ function Parser(userInput) {
 } 
 
 function newParser(userInput, event) {  // listlist
-    list_of_dbs = ["keys", "arex", "argex", "good", "QQ", "gloss", "san", "iye", "aqal", "occ","auth", "cats", "syn", "jbkeys", "todo", "most", "33-34Savitri", "super", "fulldatabase", "cleaned", "major", "wikiauthors"]
-    list_of_special_commands = ["process auth"]
+    list_of_dbs = ["keys", "major", "fulldatabase", "33-34Savitri", "gloss", "auth", "wikiauthors", "san", "iye", "aqal", "occ", "cats", "syn", "jbkeys", "todo", "most"]
 
     userInput = userInput.toLowerCase();
     userInput = Parser(userInput)
@@ -198,58 +140,30 @@ function removeChildren() {
     }
 }
 
-function libraryProcessor() {
-
-}
 
 function prePrint(event, db, userInput, oldInputForm) {
     req = setUp(db)
     consoleInfo("userInput: "+userInput)
     consoleInfo("typeof(oldInputForm): "+typeof(oldInputForm))
-    //consoleInfo(db)
 
     if (userInput.length < 3 && db == "keys") {
-        // for long searches where input.length < 2
         console.log("prePrint: IF"+userInput)
         quickPrint(req, userInput, db)
     }
 
-    //acacac
-    //else if ( userInput.match("^ac ") { authCount(event, db, 7) }
-    else if ( userInput == "ac arex" ) { authCount(event, "arex", 15) }
+    //acacacac
     else if ( userInput == "ac keys" ) { authCount(event, "keys", 3) }
-    else if ( userInput == "ac good" ) { authCount(event, "good", 7) }
-    else if ( userInput == "ac argex" ) { authCount(event, "argex", 7) }
-    else if ( userInput == "ac super" ) { authCount(event, "super", 15) }
-    else if ( userInput == "ac cleaned" ) { authCount(event, "cleaned", 3) }
     else if ( userInput == "ac major" ) { authCount(event, "major", 5) }
     else if ( userInput == "ac fulldatabase" ) { authCount(event, "fulldatabase", 15) }
-
     else if ( userInput == "Savitri" ) {
-        //document.write("  _/\           /\_ ")
-        //document.write("_/---\-_______-/---\_")
-        //document.getElementById("output").innerHTML += "_/***\-______________-/***\_<br>"
         consoleInfo("prePrint: Savitri ")
         db = "33-34Savitri"
         regexPrint(req, userInput, db)
-        //regexPrint("")
-        //regexPrint("")
     }
-
-
-    else if (userInput == "lib") {
-        window.location.replace("file:///home/oem/Documents/Code/KEYS/the_lib.html");
-    }
-
-    // ADDDDDDDDDD TO DATABASE!!!!
+    else if (userInput == "lib") { window.location.replace("file:///home/oem/Documents/Code/KEYS/the_lib.html"); }
     // dbdbdbdbdb
-    else if (db == "good" || db == "argex" || db == "super" || db == "fulldatabase" || db == "cleaned" || db == "major" ) {
-        quickPrint(req, userInput, db)
-    }
-
-    else if (db == "todo" || db == "cats" || db == "keys" ) {
-    // inner HTML print (cats and todo)
-        consoleInfo("prePrint: todo || cats || keys: ")
+    else if (db == "fulldatabase" || db == "major" ) { quickPrint(req, userInput, db) }
+    else if (db == "todo" || db == "cats" || db == "keys" ) { consoleInfo("prePrint: todo || cats || keys: ")
         regexPrint(req, userInput, db)
     }
 
@@ -257,9 +171,7 @@ function prePrint(event, db, userInput, oldInputForm) {
         regexPrint(req, userInput, db)
     }
 
-    else if (db == "keys") { 
-        // color Print if simple expression (God, Sri Aurobindo)
-        console.log("prePrint: ELSEIF"+db)
+    else if (db == "keys") { console.log("prePrint: ELSEIF"+db)
         try {
             colorPrint(req, userInput, db)
         }
@@ -425,10 +337,7 @@ function sectionalPrint(file, input, db) {
     // PRINT
     s = 20;
     for (x = location-s; x < location+s; x++) { 
-        if (x == location) { 
-            document.getElementById("output").innerHTML += "<b>"+newvalues[x]+"</b>"
-                //document.getElementById("output").innerHTML += values[x]
-        }
+        if (x == location) { document.getElementById("output").innerHTML += "<b>"+newvalues[x]+"</b>" }
 
         else if (newvalues[x] != "<br>") {document.getElementById("output").appendChild(document.createTextNode(newvalues[x].replace('<br>','').replace('<p>','')));}
 
@@ -440,7 +349,6 @@ function sectionalPrint(file, input, db) {
 
 function superCount(arr) {
     var a = [], b = [], prev;
-
     arr.sort();
     for ( var i = 0; i < arr.length; i++ ) {
         if ( arr[i] !== prev ) {
@@ -450,20 +358,19 @@ function superCount(arr) {
             b[b.length-1]++;
         }
         prev = arr[i];
-    }
+    } return [a, b]; 
+}
 
-    return [a, b];
+function WhichButton(event) {
+  alert("You pressed button: " + event.button)
 }
 
 
-function test_out(auth, x) {
+function makeDiv(auth, x) {
     var div = document.createElement("div"+x);
+    console.log("f makeDiv: x/auth: "+x+"::"+auth)  // 19: camus
 
-    //div.style.width = "100px";
-    //div.style.height = "100px";
-    //div.style.background = "red";
-    //div.style.color = "white";
-    div.innerHTML = '<div id="demo" onmouseover="mouseOn('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+'</b> (<span id="demo'+x+'"></span>)</p></div>'
+    div.innerHTML = '<div id="demo" onmouseup="mouseOn('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+'</b> (<span id="demo'+x+'"></span>)</p></div>'
 
     document.getElementById("output").appendChild(div);
 }
@@ -487,63 +394,53 @@ function authCount(event, db, moreCountsThen) {
         the_cut = the_cut.trim()
         authbucket.push(the_cut);
     } 
-
     superArray = superCount(authbucket)
-    bySize = []
 
     for (x = 0; x < authbucket.length; x++) {
         if (superArray[1][x] > moreCountsThen) {
-            //bySize.push(superArray[1][x]+" :: "+superArray[0][x])
-
             //document.getElementById("output").appendChild(document.createTextNode(superArray[0][x]+" :: "+superArray[1][x]));
             //document.getElementById("output").appendChild(document.createElement("br"));
             //document.getElementById("output").appendChild(document.createTextNode());
-            test_out(superArray[0][x], x)
+            makeDiv(superArray[0][x], x)
             //console.log("authbucket.length "+authbucket.length+authbucket[x])
-
         }
     }
     //window.stop();
 }
-//document.getElementById("output").appendChild(document.createTextNode(values[x]));
-
-//<div id="demo" onmouseover="MouseOn()" onmouseout="MouseOff()"><p><b>Sri Aurobindo</b> (<span id="demo2"></span>)</p></div>
 
 
-// EVENT LISTENER
-window.addEventListener('keyup', function (event) { // disables some keys
-    if (event.keyCode === 9) { //left tab
-        event.preventDefault();
-        return false;
-    }
+function mouseOn(x) {
+    wikit = setUp("wikiauthors")
+    var node = document.getElementById('demo')
+    textContent = node.childNodes[0].innerHTML
+    text_length = textContent.length
+    var query = new RegExp("^"+""+".*", "img");
+    entry = (wikit.responseText.match(query, "img"));
+    authName = textContent.slice(1, text_length-4)
 
-    if (event.keyCode === 16) { //left shift
-        event.preventDefault();
-        return false;
-    }
-    if (event.keyCode === 36) { //home
-        active = document.activeElement.tagName
-        if (active == "INPUT") { 
-            console.log("addEventListener: INPUT: "+active)
-        } 
-        if (active == "home") {
-            console.log("addEventListener: home: "+active)
-            scroll(0,0)
-            //event.preventDefault();
-            //return false;
+    console.log("f mouseOn: node.attributes.length: "+node.attributes.length) 
+    console.log("f mouseOn: node.attributes.name: "+node.attributes[1].name)
+    console.log("f mouseOn: node.childNodes: "+node.childNodes)  //>>> [object NodeList]
+    console.log("f mouseOn: node.childNodes[0]: "+node.childNodes[0]) //>>> [object HTMLParagraphElement]
+    console.log("f mouseOn: node.childElementCount: "+node.childElementCount) //>>> 1
+    console.log("f mouseOn: node.childNodes[0]: "+node.childNodes[0].innerHTML)  //>>> <b>?</b> (<span id="demo5"></span>)
+    console.log("f mouseOn: entry.length/wikit.length: "+entry.length+"/"+wikit.length) //860
+    console.log("f mouseOn: x: "+x)    //>>> 19 (on camus)
+    console.log("f mouseOn: node: "+node)
+    console.log("f mouseOn: textContent: "+textContent)  //>>> textContent: <b>?</b> (<span id="demo5"></span>)
+    console.log("f mouseOn: authName ::: "+authName)  //>>> f mouseOn: authName ::: b>?</b> (<span id="demo5"></sp
+    //for (x=0; x < node.attributes.length; x++) { console.log("f mouseOn: node.attributes[x]: "+node.attributes[x]) }
+
+    for (var i = 0; i < entry.length; i++) {
+        if (authName != "") {
+            //console.log("f mouseOn: i/entry[i]: "+i+"/"+entry[i]) //prints out 800 things.. i=19 = crowley
+            if (entry[i].includes("Aleister Crowley")) {
+                //console.log("authName :"+authName)
+                //console.log("match "+entry[i])
+                //console.log(entry[i])
+            }
         }
-    }
-});
+    } document.getElementById("demo"+x).appendChild(document.createTextNode("values"+x+": "+entry[x]));
+}
 
-    wikit_list = []
-    filebucket = []
-    authbucket = []
-    //document.getElementById("myinput").addEventListener("keyup", authCount); 
-
-    savitri_list = []
-    db = ""
-    addEventListener("keyup", getInput);
-
-
-
-//document.getElementById("myinput").addEventListener("keyup", getInput); 
+function mouseOff(x) { new_removeChildren("demo"+x) }
