@@ -1,7 +1,3 @@
-
-<script>
-
-    wikit_list = []
     filebucket = []
     authbucket = []
     savitri_list = []
@@ -24,15 +20,6 @@ function getInput(event) {
     if (event.keyCode == 13) { // ENTER KEYPRESS
         db = ""
         new_removeChildren("output")
-        if (userInput[0] == "!" && savitri_list.length > 0) {
-            new_removeChildren("output")
-            indexNum = userInput.slice(1)
-            target = savitri_list[indexNum] // = savitri passage
-            brIndex = savitri_list[indexNum].indexOf("<br>")
-            stem = savitri_list[indexNum].slice(1,brIndex)
-            file = setUp("33-34Savitri")
-            sectionalPrint(file, stem, "33-34Savitri")
-        }
         arguments = newParser(userInput, event)
         scroll(0,0)
         document.getElementById("myinput").blur()
@@ -70,28 +57,34 @@ function newParser(userInput, event) {          // listlistlistlistdb
 
 function prePrint(event, db, userInput, oldInputForm) {
     req = setUp(db)
+    userInput = document.getElementById("myinput").value;
+    if (userInput[0] == "!" && savitri_list.length > 0) { // SAVITRI SECTIONAL PRINT
+        new_removeChildren("output")
+        indexNum = userInput.slice(1)
+        target = savitri_list[indexNum] // = savitri passage
+        brIndex = savitri_list[indexNum].indexOf("<br>")
+        stem = savitri_list[indexNum].slice(1,brIndex)
+        file = setUp("33-34Savitri")
+        sectionalPrint(file, stem, "33-34Savitri")
+    }
+    else if (userInput.length < 2 && db == "keys") { quickPrint(req, userInput, db) }
     /// acacacac 
-    if (userInput.length < 3 && db == "keys") { quickPrint(req, userInput, db) }
-    else if ( userInput == "ac keys" ) { authCount(event, "keys", 3) }
-    else if ( userInput == "ac major" ) { authCount(event, "major", 5) }
-    else if ( userInput == "ac fulldatabase" ) { authCount(event, "fulldatabase", 15) }
-    else if ( userInput == "Savitri" ) { db = "33-34Savitri"; regexPrint(req, userInput, db) }
+    else if ( userInput.toLowerCase() == "ac keys" ) { authCount(event, "keys", 3) }
+    else if ( userInput.toLowerCase() == "ac major" ) { authCount(event, "major", 5) }
+    else if ( userInput.toLowerCase() == "ac fulldatabase" ) { authCount(event, "fulldatabase", 15) }
+    // links
     else if ( userInput == "lib") { window.location.replace("file:///home/oem/Documents/Code/KEYS/the_lib.html"); }
     /// dbdbdbdbdb
-    else if ( db == "fulldatabase" || db == "major" ) { quickPrint( req, userInput, db ) }     
-    else if ( db == "todo" || db == "cats" || db == "keys" ) { regexPrint( req, userInput, db ) }
-    else if ( userInput.match("\\.")) { regexPrint( req, userInput, db ) }
-    else if ( db == "keys") { 
-        try { colorPrint( req, userInput, db ) } 
-        catch(err) { regexPrint( req, userInput, db ) }
-    } else { regexPrint( req, userInput, db ) }
+    else if ( db == "fulldatabase" || db == "major" ) { quickPrint( req, oldInputForm, db ) } // QUICKPRINT FOR BIG DATABASES
+    else { regexPrint( req, oldInputForm, db ) }
 
 }
 
 
 function setUp(filename) {
     var req = new XMLHttpRequest();
-    req.open("GET", check_address(filename, req), false);
+    newfilename = check_address(filename, req)
+    req.open("GET", newfilename, false);
     req.send(null);
     return req
 }
@@ -110,35 +103,10 @@ function check_address(filename, req) {
     }
 }
 
-// -----------------------------------------------------//
-//  COLORPRINT, REGEXPRINT, QUICKPRINT, SECTIONALPRINT  //
-// -----------------------------------------------------//
-
-function colorPrint(file, input, db) {
-    var count = 0
-    var query = new RegExp(".*"+input+".*", "gim");
-	values = file.responseText.match(query);    
-    for (var x = 0; x < values.length; x++) {
-        input_start = ""; 
-        input_end = "";
-        string_length = "";
-        input_start = values[x].toLowerCase().indexOf(input);
-        input_end = input_start + input.length
-        string_length = values[x].length
-        pre = values[x].substr(0, input_start);
-        boldinput = "<b>"+values[x].substr(input_start, input.length)+"</b>";
-        post = values[x].substr(input_end, (string_length-input_end));
-        document.getElementById("output").innerHTML += pre + boldinput + post
-        //document.getElementById("output").innerHTML += "S:"+input_start+", E:"+input_end+", Input.L:"+input.length+", boldInput.L:"+boldinput.length+", PRE.L:"+pre.length+", POST.L:"+post.length+", S.L:"+string_length
-        if (db != "todo" && values[x] != "") { 
-            document.getElementById("output").appendChild(document.createElement("br"));
-            document.getElementById("output").appendChild(document.createElement("br"));
-        }
-        if (db == "todo" && values[x] != "") { document.getElementById("output").appendChild(document.createElement("br")); }
-        count++;
-    } document.getElementById("output").appendChild(document.createTextNode(count));
-}
-
+// ---------------------------------------------------------------------//
+//  PREPRINT --> (REGEXPRINT, QUICKPRINT, SECTIONALPRINT, AUTHCOUNT)    //
+//  AUTHCOUNT --> MAKEDIV --> MOUSECLICK                                //
+// ---------------------------------------------------------------------//
 
 function regexPrint(file, input, db) { 
     var sav_index = 0
@@ -147,18 +115,14 @@ function regexPrint(file, input, db) {
 	values = file.responseText.match(query);
     savitri_list = []
     for (var x = 0; x < values.length; x++) {
-        if (db == "arex") { document.getElementById("output").appendChild(document.createTextNode(values[x])); }
-        else if (values[x].includes(", Savitri")) { // QUERY FOR SAVITRI?
+        if (values[x].includes(", Savitri")) { // QUERY FOR SAVITRI?
             console.log("regexPrint: db != 33-34Savitri")
             console.log(sav_index.length+"sav_index||savitri_list"+savitri_list.length)
             document.getElementById("output").innerHTML += values[x]+" "+"[!"+sav_index+"]";
             savitri_list.push(values[x]);
             sav_index ++
         }
-        else if (db == "33-34Savitri") {
-            console.log("regexPrint: db == 33-34Savitri")
-            document.getElementById("output").innerHTML += values[x];
-        }
+        else if (db == "33-34Savitri") { document.getElementById("output").innerHTML += values[x]; }
         else { document.getElementById("output").innerHTML += values[x]; }
         if (db != "todo" && values[x] != "") { 
             document.getElementById("output").appendChild(document.createElement("br"));
@@ -167,89 +131,43 @@ function regexPrint(file, input, db) {
         if (db == "todo" && values[x] != "") { document.getElementById("output").appendChild(document.createElement("br")); }
         count++;
     } document.getElementById("output").appendChild(document.createTextNode(count));
-}
-
-
-function quickPrint(file, input, db) {
+} // QUICKPRINT
+function quickPrint(file, input, db) {              
     var count = 0
     var query = new RegExp(".*"+input+".*", "gim");
 	values = file.responseText.match(query);
     for (var x = 0; x < values.length; x++) {       
         document.getElementById("output").appendChild(document.createTextNode(values[x]));
         if (db != "todo" && values[x] != "") { document.getElementById("output").appendChild(document.createElement("br")); }
-        if (db == "todo" || db == "super" || db == "fulldatabase" || db == "major" && values[x] != "") { //lblblblblb
+        if (db == "todo" || db == "fulldatabase" || db == "major" && values[x] != "") { //lblblblblb
             document.getElementById("output").appendChild(document.createElement("br"));
         } count++;
     } document.getElementById("output").appendChild(document.createTextNode(count));
-}
-
-
-function sectionalPrint(file, input, db) { // BOOK PRINTER
+} // SECTIONAL PRINT
+function sectionalPrint(file, input, db) {             
     var count = 0
     var location = 0
     var query = new RegExp(".*"+input+".*", "gim");
     var setUp = new RegExp(".*"+"."+".*", "gim");
 	newvalues = file.responseText.match(setUp);
-    console.log("sectionalPrint: file: "+file)
-    console.log("sectionalPrint: newvalues[38774]: "+newvalues[38774])
-    console.log("sectionalPrint: newvalues.length: "+newvalues.length)
-    console.log("sectionalPrint: input: "+input)
-    console.log("sectionalPrint: $.trim(input): '"+$.trim(input)+"'")
-    console.log("sectionalPrint: $.newvalues[19387]: "+newvalues[19387])
-    console.log("sectionalPrint: $.newvalues[19387].length: "+newvalues[19387].length)
-    console.log("sectionalPrint: $.trim(input).length: "+$.trim(input).length)
-    for (x = 0; x < newvalues.length; x++) {  // LOCATE IN SAVITRI
+    for (x = 0; x < newvalues.length; x++) {            // LOCATE IN BOOK
         if (newvalues[x].includes($.trim(input))) { console.log("fixed mind: "+newvalues[x]+" + "+x); }
         if (newvalues[x].includes($.trim(input))) {
             location = x
-            console.log("sectionalPrint: location: "+location)
-            console.log("sectionalPrint: typeof location: "+(typeof location))
-            console.log("sectionalPrint: values[location] & x:::: "+newvalues[location]+" & "+x)
         }
     } s = 20;
-    for (x = location-s; x < location+s; x++) { // PRINT
+    for (x = location-s; x < location+s; x++) {         // PRINT
         if (x == location) { document.getElementById("output").innerHTML += "<b>"+newvalues[x]+"</b>" }
         else if (newvalues[x] != "<br>") {document.getElementById("output").appendChild(document.createTextNode(newvalues[x].replace('<br>','').replace('<p>','')));}
         if (newvalues[x].match("<br>")) {document.getElementById("output").appendChild(document.createElement("br"));}
     }
 }
 
-
-function new_removeChildren(id) { // like output, or demo
-    for (x = 0; x < document.getElementById(id).childNodes.length; x++) { 
-        document.getElementById(id).removeChild(document.getElementById(id).childNodes[x])
-    }
-    if ( document.getElementById(id).childNodes.length > 0) { new_removeChildren(id) }
-}
-
-
-function superCount(arr) {
-    var a = [], b = [], prev;
-    arr.sort();
-    for ( var i = 0; i < arr.length; i++ ) {
-        if ( arr[i] !== prev ) {
-            a.push(arr[i]);
-            b.push(1);
-        } else {
-            b[b.length-1]++;
-        }
-        prev = arr[i];
-    } return [a, b]; 
-}
-
-
-function makeDiv(auth, x) {
-    var div = document.createElement("div"+x);
-    console.log("f makeDiv: x/auth: "+x+"::"+auth)  // 19: camus
-    div.innerHTML = '<div id="demo" onmouseup="mouseOn('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+'</b> (<span id="demo'+x+'"></span>)</p></div>'
-    document.getElementById("output").appendChild(div);
-}
-
-
-function authCount(event, db, moreCountsThen) {
+function authCount(event, db, moreCountsThen) {         // AC
     file = setUp(db)
     quickListAFile(file, ".")
     r = 0
+
     for (x = r; x < filebucket.length; x++) { 
         i = filebucket[x].indexOf("~")
         comma = filebucket[x].indexOf(",")
@@ -262,15 +180,56 @@ function authCount(event, db, moreCountsThen) {
         the_cut = the_cut.trim()
         authbucket.push(the_cut);
     } superArray = superCount(authbucket)
+
     for (x = 0; x < authbucket.length; x++) {
         if (superArray[1][x] > moreCountsThen) {
             //document.getElementById("output").appendChild(document.createTextNode(superArray[0][x]+" :: "+superArray[1][x]));
             //document.getElementById("output").appendChild(document.createElement("br"));
             //document.getElementById("output").appendChild(document.createTextNode());
-            makeDiv(superArray[0][x], x)
+            makeDiv(superArray[0][x]+"</b>: ("+superArray[1][x]+")", x)
             //console.log("authbucket.length "+authbucket.length+authbucket[x])
         }
     } //window.stop();
+}
+function makeDiv(auth, x) {
+    var div = document.createElement("div"+x);
+    console.log("f makeDiv: x/auth: "+x+"::"+auth)  // 19: camus
+    div.innerHTML = '<div id="demo" onmouseup="mouseClick('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+' (+<span id="demo'+x+'"></span>)</p></div>'
+    document.getElementById("output").appendChild(div);
+}
+function mouseOff(x) { new_removeChildren("demo"+x) }
+function mouseClick(x) {
+    wikit = setUp("wikiauthors")
+    var node = document.getElementById('demo')
+    textContent = node.childNodes[0].innerHTML
+    text_length = textContent.length
+    var query = new RegExp("^"+""+".*", "img");
+    entry = (wikit.responseText.match(query, "img"));
+    authName = textContent.slice(1, text_length-4)
+
+    console.log("f mouseClick: node.attributes.length: "+node.attributes.length) 
+    console.log("f mouseClick: node.attributes.name: "+node.attributes[1].name)
+    console.log("f mouseClick: node.childNodes: "+node.childNodes)  //>>> [object NodeList]
+    console.log("f mouseClick: node.childNodes[0]: "+node.childNodes[0]) //>>> [object HTMLParagraphElement]
+    console.log("f mouseClick: node.childElementCount: "+node.childElementCount) //>>> 1
+    console.log("f mouseClick: node.childNodes[0]: "+node.childNodes[0].innerHTML)  //>>> <b>?</b> (<span id="demo5"></span>)
+    console.log("f mouseClick: entry.length/wikit.length: "+entry.length+"/"+wikit.length) //860
+    console.log("f mouseClick: x: "+x)    //>>> 19 (on camus)
+    console.log("f mouseClick: node: "+node)
+    console.log("f mouseClick: textContent: "+textContent)  //>>> textContent: <b>?</b> (<span id="demo5"></span>)
+    console.log("f mouseClick: authName ::: "+authName)  //>>> f mouseClick: authName ::: b>?</b> (<span id="demo5"></sp
+    //for (x=0; x < node.attributes.length; x++) { console.log("f mouseClick: node.attributes[x]: "+node.attributes[x]) }
+
+    for (var i = 0; i < entry.length; i++) {
+        if (authName != "") {
+            //console.log("f mouseClick: i/entry[i]: "+i+"/"+entry[i]) //prints out 800 things.. i=19 = crowley
+            if (entry[i].includes("Aleister Crowley")) {
+                //console.log("authName :"+authName)
+                //console.log("match "+entry[i])
+                //console.log(entry[i])
+            }
+        }
+    } document.getElementById("demo"+x).appendChild(document.createTextNode("values"+x+": "+entry[x]));
 }
 
 
@@ -281,37 +240,21 @@ function quickListAFile(file, input) { // (file, ".", db)
 }
 
 
-function mouseOff(x) { new_removeChildren("demo"+x) }
-function mouseOn(x) {
-    wikit = setUp("wikiauthors")
-    var node = document.getElementById('demo')
-    textContent = node.childNodes[0].innerHTML
-    text_length = textContent.length
-    var query = new RegExp("^"+""+".*", "img");
-    entry = (wikit.responseText.match(query, "img"));
-    authName = textContent.slice(1, text_length-4)
 
-    console.log("f mouseOn: node.attributes.length: "+node.attributes.length) 
-    console.log("f mouseOn: node.attributes.name: "+node.attributes[1].name)
-    console.log("f mouseOn: node.childNodes: "+node.childNodes)  //>>> [object NodeList]
-    console.log("f mouseOn: node.childNodes[0]: "+node.childNodes[0]) //>>> [object HTMLParagraphElement]
-    console.log("f mouseOn: node.childElementCount: "+node.childElementCount) //>>> 1
-    console.log("f mouseOn: node.childNodes[0]: "+node.childNodes[0].innerHTML)  //>>> <b>?</b> (<span id="demo5"></span>)
-    console.log("f mouseOn: entry.length/wikit.length: "+entry.length+"/"+wikit.length) //860
-    console.log("f mouseOn: x: "+x)    //>>> 19 (on camus)
-    console.log("f mouseOn: node: "+node)
-    console.log("f mouseOn: textContent: "+textContent)  //>>> textContent: <b>?</b> (<span id="demo5"></span>)
-    console.log("f mouseOn: authName ::: "+authName)  //>>> f mouseOn: authName ::: b>?</b> (<span id="demo5"></sp
-    //for (x=0; x < node.attributes.length; x++) { console.log("f mouseOn: node.attributes[x]: "+node.attributes[x]) }
+function new_removeChildren(id) {
+    for (x = 0; x < document.getElementById(id).childNodes.length; x++) { 
+        document.getElementById(id).removeChild(document.getElementById(id).childNodes[x])
+    }
+    if ( document.getElementById(id).childNodes.length > 0) { new_removeChildren(id) }
+}
 
-    for (var i = 0; i < entry.length; i++) {
-        if (authName != "") {
-            //console.log("f mouseOn: i/entry[i]: "+i+"/"+entry[i]) //prints out 800 things.. i=19 = crowley
-            if (entry[i].includes("Aleister Crowley")) {
-                //console.log("authName :"+authName)
-                //console.log("match "+entry[i])
-                //console.log(entry[i])
-            }
-        }
-    } document.getElementById("demo"+x).appendChild(document.createTextNode("values"+x+": "+entry[x]));
+
+function superCount(arr) {
+    var a = [], b = [], prev;
+    arr.sort();
+    for ( var i = 0; i < arr.length; i++ ) {
+        if ( arr[i] !== prev ) { a.push(arr[i]); b.push(1); }
+        else { b[b.length-1]++; } 
+    prev = arr[i];
+    } return [a, b]; 
 }
