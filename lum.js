@@ -1,4 +1,3 @@
-
     filebucket = []         //file gets loaded into this array
     authbucket = []
     savitri_list = []
@@ -19,6 +18,8 @@ window.addEventListener('keyup', function (event) { // disables some keys
 function getInput(event) {
     userInput = document.getElementById("myinput").value;
     if (event.keyCode == 13) { // ENTER KEYPRESS
+        //InputLog()
+        //getIp()
         db = ""
         new_removeChildren("output")
         arguments = newParser(userInput, event)
@@ -27,13 +28,14 @@ function getInput(event) {
     }
     if (event.keyCode == 9) { document.getElementById("myinput").focus(); scroll(0,0); }    // TAB KEYPRESS
     if (event.keyCode == 20) { new_removeChildren("output") }                               // LEFT SHIFT KEYPRESS (16) && CAPS (20)
+		if (event.keyCode == 27) { document.getElementById("myinput").blur() }									// ESC
     if (event.keyCode == 36) { console.log("home") }                                        // or 33 (home keypress, pgup)
  //document.getElementById("myinput").scrollIntoView();
 }
 
 
-function newParser(userInput, event) {          // listlistlistlistdb
-    list_of_dbs = ["keys", "major", "fulldatabase", "33-34Savitri", "gloss", "auth", "wikiauthors", "san", "iye", "aqal", "occ", "cats", "syn", "jbkeys", "todo", "most"]
+function newParser(userInput, event) {          // listlistlistlistdbdbdb
+    list_of_dbs = ["keys", "major", "fulldatabase", "33-34Savitri", "gloss", "auth", "wikiauthors", "san", "iye", "aqal", "occ", "cats", "syn", "jbkeys", "todo", "most", "inv"]
     userInput = userInput.toLowerCase();
     if ((userInput.split(" ").length) > 1) { userInput = userInput.split(" "); }
     if (db == "") { db = "keys" }
@@ -51,6 +53,7 @@ function newParser(userInput, event) {          // listlistlistlistdb
         }
     }
     userInput = userInput.replace(/,/g, " ")
+    oldInputForm = String(oldInputForm).replace(/,/g, " ")
     prePrint(event, db, userInput, oldInputForm)
     return userInput
 }
@@ -59,6 +62,7 @@ function newParser(userInput, event) {          // listlistlistlistdb
 function prePrint(event, db, userInput, oldInputForm) {
     req = setUp(db)
     userInput = document.getElementById("myinput").value;
+    console.log("userInput/oldInputForm: "+userInput+":"+oldInputForm)
     if (userInput[0] == "!" && savitri_list.length > 0) { // SAVITRI SECTIONAL PRINT
         new_removeChildren("output")
         indexNum = userInput.slice(1)
@@ -72,11 +76,11 @@ function prePrint(event, db, userInput, oldInputForm) {
     /// acacacac 
     else if ( userInput.toLowerCase() == "ac keys" ) { authCount(event, "keys", 3) }
     else if ( userInput.toLowerCase() == "ac major" ) { authCount(event, "major", 5) }
-    else if ( userInput.toLowerCase() == "ac fulldatabase" ) { authCount(event, "fulldatabase", 15) }
+    else if ( userInput.toLowerCase() == "ac fulldatabase" ) { authCount(event, "fulldatabase", 2) }
     // links
     else if ( userInput == "lib") { window.location.replace("file:///home/oem/Documents/Code/KEYS/the_lib.html"); }
     /// dbdbdbdbdb
-    else if ( db == "fulldatabase" || db == "major" ) { quickPrint( req, oldInputForm, db ) } // QUICKPRINT FOR BIG DATABASES
+    else if ( db == "fulldatabase" || db == "major" || db == "wikiauthors") { quickPrint( req, oldInputForm, db ) } // QUICKPRINT FOR BIG DATABASES
     else { regexPrint( req, oldInputForm, db ) }
 
 }
@@ -98,9 +102,8 @@ function check_address(filename, req) {
     } else { 
         console.log("ONLINE");    
         newfilename = "https://raw.githubusercontent.com/integralyogin/data-for-lum/master/"+filename
-        if (filename.includes('fulldatabase')) {
-            newfilename = "https://gitlab.com/integralyogin/fulldatabase/raw/0f997955e3a092d8062556eb0e4658e291ff43bf/"+filename
-        } return newfilename
+        //if (filename.includes('fulldatabase')) { newfilename = "dbs/fulldatabase" } 
+				return newfilename
     }
 }
 
@@ -122,9 +125,8 @@ function regexPrint(file, input, db) {
             document.getElementById("output").innerHTML += values[x]+" "+"[!"+sav_index+"]";
             savitri_list.push(values[x]);
             sav_index ++
-        }
-        else if (db == "33-34Savitri") { document.getElementById("output").innerHTML += values[x]; }
-        else { document.getElementById("output").innerHTML += values[x]; }
+        } else if (db == "33-34Savitri") { document.getElementById("output").innerHTML += values[x];
+        } else { document.getElementById("output").innerHTML += values[x]; }
         if (db != "todo" && values[x] != "") { 
             document.getElementById("output").appendChild(document.createElement("br"));
             document.getElementById("output").appendChild(document.createElement("br"));
@@ -140,7 +142,7 @@ function quickPrint(file, input, db) {
     for (var x = 0; x < values.length; x++) {       
         document.getElementById("output").appendChild(document.createTextNode(values[x]));
         if (db != "todo" && values[x] != "") { document.getElementById("output").appendChild(document.createElement("br")); }
-        if (db == "todo" || db == "fulldatabase" || db == "major" && values[x] != "") { //lblblblblb
+        if (db == "todo" || db == "fulldatabase" || db == "major" || db == "wikiauthors" && values[x] != "") { //lblblblblb
             document.getElementById("output").appendChild(document.createElement("br"));
         } count++;
     } document.getElementById("output").appendChild(document.createTextNode(count));
@@ -183,19 +185,16 @@ function authCount(event, db, moreCountsThen) {         // AC
         authbucket.push(the_cut);
         if (x < 3) { console.log("(n authCount) x:authbucket[x]:filebucket[x] >>> "+x+":"+authbucket[x]+":"+filebucket[x]); }    //>>> 2:Socrates:"Be as you wish to seem. ~ Socrates"
     } superArray = superCount(authbucket)
+    if (typeof counterA === 'undefined') { counterA = 0 }
     for (x = 0; x < authbucket.length; x++) {           // MAKE DIV OF SUPERARRAY
-        if (superArray[1][x] > moreCountsThen) {
-            //document.getElementById("output").appendChild(document.createTextNode(superArray[0][x]+" :: "+superArray[1][x]));
-            //document.getElementById("output").appendChild(document.createElement("br"));
-            //document.getElementById("output").appendChild(document.createTextNode());
-            makeDiv(superArray[0][x]+"</b>: ("+superArray[1][x]+")", x)
-            //console.log("authbucket.length "+authbucket.length+authbucket[x])
+        if (superArray[1][x] > moreCountsThen) { 
+            makeDiv(superArray[0][x]+"</b>: ("+superArray[1][x]+" results in "+db+")", x) 
+            counterA += 1
         } 
-    }  //window.stop();
-}
+    } document.getElementById("output").appendChild(document.createTextNode(counterA+" authors listed with at least x results"));  //window.stop();
+} 
 function makeDiv(auth, x) {
     var div = document.createElement("div"+x);
-    if (x < 25) { console.log("(n makeDiv) x/auth >>> "+x+"::"+auth) }      //>>> 19::Albert Camus</b>: (8)
     div.innerHTML = '<div id="demo" onmouseup="mouseClick('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+' (+<span id="demo'+x+'"></span>)</p></div>'
     document.getElementById("output").appendChild(div);
 }
@@ -204,35 +203,36 @@ function mouseClick(x) {
     wikit = setUp("wikiauthors")
     var node = document.getElementById('demo')
     textContent = node.childNodes[0].innerHTML
-
     text_length = textContent.length
     var query = new RegExp("^"+""+".*", "img");
     entry = (wikit.responseText.match(query, "img"));
     authName = textContent.slice(1, text_length-4)
-
-    //for (x=0; x < node.attributes.length; x++) { console.log("(n mouseClick): node.attributes[x]: "+node.attributes[x]) }
     auth = ""
     for (var i = 0; i < document.all.namedItem("demo").length; i++) {  //860 entries
         if (authName != "") {
             if (document.all.namedItem("demo")[i].innerHTML.includes('"demo'+x+'"')) {
-                //console.log(document.all.namedItem("demo")[i].innerText.split(":")[0])
                 auth = String(document.all.namedItem("demo")[i].innerText.split(":")[0])
-                console.log("in: auth: "+auth)
-                
             } 
         }
     }  
-//    console.log("out: auth: "+auth)
-    for (i = 0; i < entry.length; i++) {
-        if (entry[i].indexOf(auth) == 0) {
-            console.log("i/entry[i]: "+i+"/"+entry[i])
-            r = i
+    for (i = 0; i < entry.length; i++) { if (entry[i].indexOf(auth) == 0) { r = i }}  // GETS ENTRIES THAT START WITH AUTH NAME (can be removed)
+    if (r == "") {
+        indexOfName = []
+        ENTRIES = []
+        for (i = 0; i < entry.length; i++) {
+            if (entry[i].includes(auth)) {             
+                ENTRIES.push(i)
+                indexOfName.push(entry[i].indexOf(auth))
+            }
         }
-    }  soMuchInfo()
-
-
-   document.getElementById("demo"+x).appendChild(document.createTextNode(entry[r]));
+        idx=indexOfName.indexOf(Math.min.apply(null,indexOfName))
+        r = ENTRIES[idx]
+    } //soMuchInfo()
+//   document.getElementById("demo"+x).appendChild(document.createTextNode(entry[r]));
+   document.getElementById("demo"+x).innerHTML += "<p>"+entry[r]
    r = ""
+   ENTRIES = []
+   indexOfName = []
 }
 
 
@@ -243,36 +243,7 @@ function quickListAFile(file, input) { // (file, ".", db)
 }
 
 
-function soMuchInfo(x) {
-    n = "soMuchInfo("+x+"): "
-    //console.log(document.all)
-    console.log("soMuchInfo: document.all.namedItem('demo'): "+document.all.namedItem("demo"))  //>>> [object HTMLCollection]
-    console.log("soMuchInfo: document.all.namedItem('demo').length: "+document.all.namedItem("demo").length)  // 86
-    console.log("soMuchInfo: document.all.namedItem('demo')[1]: "+document.all.namedItem("demo")[1]) // [object HTMLDivElement]
-    console.log("soMuchInfo: document.all.namedItem('demo')[1]: "+document.all.namedItem("demo")[1])
-    console.log("soMuchInfo: document.all.namedItem('demo')[1].attributes[1].value.includes('19')): "+document.all.namedItem("demo")[1].attributes[1].value.includes("19")) // true
-    console.log("soMuchInfo: document.all.namedItem('demo')[1].innerText: "+document.all.namedItem("demo")[1].innerHTML)  // Albert Camus: (8) (+) //.split(":")[0]
-    console.log("soMuchInfo: document.all.namedItem('demo')[1].innerText: "+document.all.namedItem("demo")[1].innerHTML.includes("demo"+19))
-    console.log("soMuchInfo: document.all.namedItem('demo')[2].innerText: "+document.all.namedItem("demo")[2].innerText)  // Albert Einstein: (30) (+)
-
-    for (x = 0; x < entry.length; x++) { if (entry[x].includes("Camus")) { console.log("soMuchInfo: (entry[x].includes('Camus'): x: "+x) }} //  14
-
-    console.log("authbucket.length: "+authbucket.length) 
-    console.log("authbucket[19]: "+authbucket[1]) 
-   // term = ""
- //   for (x = 0; x < 100; x++) { term += authbucket[x]; console.log("term: "+term) }
-
-    //console.log("soMuchInfo: entry[19]: "+entry[19])  // CROWLEYS WIKI
-    //console.log(n+document.getElementsByTagName("BODY").attributes.length)
-
-   // if (document.all.namedItem("demo")[1].attributes[1].value.includes("19")) { console.log("BINGO MF") }
-//    for (x = 0; x < document.all.namedItem("demo").length; x++) { console.log(document.all.namedItem("demo")[0]) }
-    //console.log(document.all.namedItem("demo").attributes[1].value)
-//    console.log(document.getElementById('demo').attributes.length)    
-    //console.log(document.getElementById('demo').attributes[1].value)
-    //console.log(window)
-}
-
+function soMuchInfo(x) { console.log(document.all) }
 
 
 function new_removeChildren(id) {
@@ -282,6 +253,20 @@ function new_removeChildren(id) {
     if ( document.getElementById(id).childNodes.length > 0) { new_removeChildren(id) }
 }
 
+
+function InputLog() {
+
+var mongo = require("./mongo_find_name_address.js");
+mongo.a();
+
+}
+
+
+function getIp() {
+$.getJSON('http://gd.geobytes.com/GetCityDetails', function(data) {
+    //data is the JSON string
+});
+}
 
 function superCount(arr) {
     var a = [], b = [], prev;
