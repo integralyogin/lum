@@ -371,7 +371,7 @@ function bookFinder(line, xloc) {
 						var underscoredtitle = book.replace(/\s/g, '_');
 						//console.log("spaceless: "+spaceless)
 						if (booklist[0][x].includes("INTEG")) {
-							console.log("booklist[0][x]:spaceless:underscoredtitle: "+booklist[0][x]+":"+spaceless+":"+underscoredtitle)
+	//						console.log("booklist[0][x]:spaceless:underscoredtitle: "+booklist[0][x]+":"+spaceless+":"+underscoredtitle)
 						}
 						if (booklist[0][x].includes(spaceless) || booklist[0][x].includes(underscoredtitle)) {
 							console.log("found book!: "+booklist[0][x])
@@ -413,7 +413,11 @@ function inBook(booklocation, leftside, xloc) {
 	values = req.responseText.match(query); // values = search results?
 	console.log("values.length: "+values.length)
 	cleanleft = leftside.replace(/\s/g, ' ');
+	console.log('cleanleft.split(" "): '+cleanleft.split(" ").length)
+	console.log('cleanleft.split(" ")[3]: '+cleanleft.split(" ")[3])
+	if (cleanleft.split(" ").length > 8) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[3]), cleanleft.indexOf(cleanleft.split(" ")[3])+20); console.log("space splitted") } 
 	console.log("leftside: "+leftside)
+	console.log("cleanleft: "+cleanleft)
 	var found = 0;
 	for (var s = 0; s < cleanleft.length-1; s++) {
 		if (s == 0) { cleanslice = cleanleft.slice(s, cleanleft.length-s) }
