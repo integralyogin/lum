@@ -4,6 +4,7 @@
     savitri_list = []
 		booklist = []
     db = ""
+		matchingbooks = []
 
 		getBookList()
 
@@ -353,6 +354,7 @@ function getBookList() {
 function bookFinder(line, xloc) {
 //		console.log("bookfinder: line: "+line)
 //	console.log("left side::: "+line.split("~")[0])
+	matchingbooks = []
 	if (line.includes("~")) { 
 			leftside = line.split("~")[0];
 			rightside = line.split("~")[1];	
@@ -362,39 +364,36 @@ function bookFinder(line, xloc) {
 		//	console.log(", count: "+count)
 				for (var x = 0; x <= count; x++) {
 					if (x == 0) { auth = rightside.split(",")[0];	}
-					if (x == 1) { book = rightside.split(",")[1]; console.log("book"); }
+					if (x == 1) { book = rightside.split(",")[1]; book = book.slice(1, book.length); console.log("book"); }
 					if (x == 1) { console.log("auth/book: "+auth+":"+book); }
 				}
+				if (book.includes("#")) { book = book.slice(0, book.indexOf("#")); book = book.trim() }
+				if (book.includes("-")) { book = book.slice(0, book.indexOf("-")); book = book.trim() }
+				if (book.includes(":")) { book = book.slice(0, book.indexOf(":")); book = book.trim() }
+				console.log("book: '"+book+"'")
 				if (typeof auth !== 'undefined' && typeof book !== 'undefined') {
 					for (var x = 0; x < booklist[0].length; x++) {
 						var spaceless = book.replace(/\s/g, '');
 						var underscoredtitle = book.replace(/\s/g, '_');
-						//console.log("spaceless: "+spaceless)
-						if (booklist[0][x].includes("INTEG")) {
-	//						console.log("booklist[0][x]:spaceless:underscoredtitle: "+booklist[0][x]+":"+spaceless+":"+underscoredtitle)
-						}
-						if (booklist[0][x].includes(spaceless) || booklist[0][x].includes(underscoredtitle)) {
-							console.log("found book!: "+booklist[0][x])
-									inBook(booklist[0][x], leftside, xloc) // inBook
-						}
-						if (booklist[0][x].includes(auth.split(" ")[auth.split(" ").length - 1].toUpperCase())) {
-							console.log("author bingo! "+booklist[0][x])
-						}
-					}
-				}
-				if (typeof auth !== 'undefined') { 
-					//check if in booklist
-					for (var x = 0; x < booklist[0].length; x++) {
-						if (booklist[0][x].includes(auth.split(" ")[auth.split(" ").length - 1].toUpperCase())) {
-					//		console.log("author bingo! "+booklist[0][x])
-						}
-						else {
-						//	console.log(auth.split(" ")[auth.split(" ").length - 1].toUpperCase())
-						}
-					}
-				}
-				if (typeof book !== 'undefined')  { console.log(book); }
-					for (var x = 0; x < booklist[0].length; x++) {
+						var hyphened = book.replace(/\s/g, '-');
+						authfront = auth.trim();
+						authfront = authfront.replace(/\s/g, '_');
+						authfront = authfront.split("_")[1];
+						console.log('authfront: "'+authfront+'"')
+						if (booklist[0][x].includes(spaceless) || booklist[0][x].includes(underscoredtitle) || booklist[0][x].includes(hyphened)) {
+								if (booklist[0][x].includes(authfront.toUpperCase())) {
+								 if (booklist[0][x].indexOf("DUPLICATES") == -1) {
+										console.log("found book!: "+booklist[0][x])
+										matchingbooks.push(booklist[0][x])
+								 }
+								}
+					 	}
+					} 
+					if (matchingbooks.length > 0) { 
+							console.log("matchingbooks.length: "+matchingbooks.length); 
+	//							matchingbooks.sort()[0]
+								inBook(matchingbooks.sort()[0], leftside, xloc); 
+					} 
 				}
 			}
 	//parse right side for auth, and book.
@@ -405,47 +404,42 @@ function bookFinder(line, xloc) {
 }
 
 function inBook(booklocation, leftside, xloc) {
-	console.log("inBook: "+booklocation+":"+leftside)
-	req = setUp(booklocation)
-	console.log("inBook: leftside: '"+leftside.slice(4,leftside.length - 1)+"'")
-  //var query = new RegExp(".*"+leftside.slice(4,leftside.length - 1)+".*", "gim");
-	var query = new RegExp(".*", "gim");
-	values = req.responseText.match(query); // values = search results?
-	console.log("values.length: "+values.length)
-	cleanleft = leftside.replace(/\s/g, ' ');
-	console.log('cleanleft.split(" "): '+cleanleft.split(" ").length)
-	console.log('cleanleft.split(" ")[3]: '+cleanleft.split(" ")[3])
-	if (cleanleft.split(" ").length > 8) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[3]), cleanleft.indexOf(cleanleft.split(" ")[3])+20); console.log("space splitted") } 
-	console.log("leftside: "+leftside)
-	console.log("cleanleft: "+cleanleft)
-	var found = 0;
-	for (var s = 0; s < cleanleft.length-1; s++) {
-		if (s == 0) { cleanslice = cleanleft.slice(s, cleanleft.length-s) }
-		if (s == 1) { cleanslice = cleanleft.slice(1, 20) } 
-		console.log("cleanslice--s: "+cleanslice+"--"+s)
-			for (var x = 0; x <= values.length; x++) {
-				if (typeof cleanslice === "undefined") { console.log("break, its undefined") }
-				//console.log("typeof cleanslice: "+typeof cleanslice+":"+cleanslice+":"+x)
-				if (values[x].includes(cleanslice)) {
-					for (var z = -14; z < 14; z++) {
-						if (values[x+z] != "") {
-							if (z != 0) { document.getElementById("demo"+xloc).innerHTML += "<p>"+values[x+z] }
-							if (z == 0) { document.getElementById("demo"+xloc).innerHTML += "<p><b>"+values[x+z]+"</b>" }
+	found = 0;
+	for (var y = 0; y <= matchingbooks.length; y++) {
+		req = setUp(matchingbooks[y])
+		var query = new RegExp(".*", "gim");
+		values = req.responseText.match(query); // values = search results?
+		cleanleft = leftside.replace(/\s/g, ' ');
+		if (cleanleft.split(" ").length > 4) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[1]), cleanleft.indexOf(cleanleft.split(" ")[1])+32); console.log("small space splitted") }
+		if (cleanleft.split(" ").length > 8) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[3]), cleanleft.indexOf(cleanleft.split(" ")[3])+32); console.log("space splitted") } 
+		if (found == 0) {
+			for (s = 0; s < cleanleft.length-1; s++) {
+				if (s == 0) { console.log("s == 0"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
+				if (s == 1) { console.log("s == 1"); cleanslice = cleanleft.slice(1, 20) } 
+				if (s > 1 && s < 6) { console.log("s > 1"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
+				console.log("cleanslice--s: "+cleanslice+"--"+s)
+					for (var x = 0; x <= values.length; x++) {
+						if (typeof cleanslice === "undefined") { console.log("break, its undefined") }
+						//console.log("typeof cleanslice: "+typeof cleanslice+":"+cleanslice+":"+x)
+						if (x == values.length) { console.log("EOF pre break") } 
+						if (typeof values[x] !== "undefined") { 
+							if (values[x].includes(cleanslice)) {
+								for (var z = -16; z < 16; z++) {
+									if (values[x+z] != "") {
+										if (z != 0) { document.getElementById("demo"+xloc).innerHTML += "<p>"+values[x+z] }
+										if (z == 0) { document.getElementById("demo"+xloc).innerHTML += "<p><b>"+values[x+z]+"</b>" }
+										}
+									}
+								found = 1;
+								break;
 						}
 					}
-					found = 1;
-					break;
-				}
-				if (x == values.length) { 
-						console.log(x+" @ EOF") 
-						console.log("EOF :cleanslice: "+cleanslice)
-				}
-
 			}
-		if (found == 1) { break; }
+			if (found == 1) { break; }
+		}
+		}
 	}
 }
-
 
 function strip(html) {
 	var tmp = document.createElement("DIV");
