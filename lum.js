@@ -67,19 +67,10 @@ function newParser(userInput, event) {          // listlistlistlistdbdbdb
 function prePrint(event, db, userInput, oldInputForm) {
     req = setUp(db)
     userInput = document.getElementById("myinput").value;
-    console.log("userInput/oldInputForm: "+userInput+":"+oldInputForm)
+    console.log("prePrint: userInput/oldInputForm: "+userInput+":"+oldInputForm)
 		console.log("event: "+event)
 		console.log(document)
-    if (userInput[0] == "!" && savitri_list.length > 0) { // SAVITRI SECTIONAL PRINT
-        new_removeChildren("output")
-        indexNum = userInput.slice(1)
-        target = savitri_list[indexNum] // = savitri passage
-        brIndex = savitri_list[indexNum].indexOf("<br>")
-        stem = savitri_list[indexNum].slice(1,brIndex)
-        file = setUp("33-34Savitri")
-        sectionalPrint(file, stem, "33-34Savitri")
-    }
-    else if (userInput.length < 2 && db == "keys") { quickPrint(req, userInput, db) } //still too slow, maybe partial releasing?
+    if (userInput.length < 2 && db == "keys") { quickPrint(req, userInput, db) } //still too slow, maybe partial releasing?
     /// acacacac 
     else if ( userInput.toLowerCase() == "ac keys" ) { authCount(event, "keys", 0) }
     else if ( userInput.toLowerCase() == "ac major" ) { authCount(event, "major", 5) }
@@ -89,6 +80,7 @@ function prePrint(event, db, userInput, oldInputForm) {
     /// dbdbdbdbdb
     else if ( db == "fulldatabase" || db == "major") { quickPrint( req, oldInputForm, db ) } // QUICKPRINT FOR BIG DATABASES
     else { 
+				console.log("regexPrint: ")
 				regexPrint( req, oldInputForm, db );
 		}
 
@@ -135,6 +127,7 @@ function check_address(filename, req) {
 // ---------------------------------------------------------------------//
 
 function regexPrint(file, input, db) { 
+		console.log("regexPrint(file, input, db): "+file+":"+input+":"+db)
     var sav_index = 0
     var count = 0
 		//console.log("input: "+input)
@@ -149,11 +142,6 @@ function regexPrint(file, input, db) {
 				var div = document.createElement("div"+x);
 				div.innerHTML += '<div id="demo"><p>'+values[x]+'<a href=javascript:bookFinder("'+rvalue+'",'+x+')>...</a><span id="demo'+x+'"></span></p></div><br><br>' //bookfinder
 				document.getElementById("output").appendChild(div);
-						
-	//					document.getElementById("output").innerHTML += "<a href=javascript:bookFinder("+values[x]+")...</a><br><br>"
-
-			 	// CONTENT ADD
-
         if (db != "todo" && values[x] != "") { 
             document.getElementById("output").appendChild(document.createElement("br"));
             document.getElementById("output").appendChild(document.createElement("br"));
@@ -245,7 +233,7 @@ function authCount(event, db, moreCountsThen) {         // AC
 
 function makeDiv(auth, x) {
     var div = document.createElement("div"+x);
-    div.innerHTML = '<div id="demo" onmouseup="mouseClick('+x+')" onmouseout="mouseOff('+x+')"><p><b>'+auth+' (+<span id="demo'+x+'"></span>)</p></div>'
+    div.innerHTML = '<div id="demo" ondblclick="mouseClick('+x+')" onclick="mouseOff('+x+')"><p><b>'+auth+' (+<span id="demo'+x+'"></span>)</p></div>'
     document.getElementById("output").appendChild(div);
 }
 
@@ -297,7 +285,7 @@ function new_removeChildren(id) {
         document.getElementById(id).removeChild(document.getElementById(id).childNodes[x])
     }
     if ( document.getElementById(id).childNodes.length > 0) { new_removeChildren(id) }
-		document.getElementById("myinput").focus(); //scroll(0,0); (scroll here broke ac keys scrolling)
+		//document.getElementById("myinput").focus(); //scroll(0,0); (scroll here broke ac keys scrolling)
 }
    
 
@@ -352,36 +340,48 @@ function getBookList() {
 }
 
 function bookFinder(line, xloc) {
-//		console.log("bookfinder: line: "+line)
+		console.log("bookfinder: line: "+line)
 //	console.log("left side::: "+line.split("~")[0])
 	matchingbooks = []
 	if (line.includes("~")) { 
 			leftside = line.split("~")[0];
 			rightside = line.split("~")[1];	
-//		console.log("rightside: "+rightside) 
-			if (rightside.includes(",")) { 
-				var count = (rightside.match(/,/g) || []).length;
-		//	console.log(", count: "+count)
+			console.log("rightside: "+rightside) 
+			if (rightside) { 
+				var count = (rightside.match(/,/g) || []).length; //comma counter (for splitting)
 				for (var x = 0; x <= count; x++) {
 					if (x == 0) { auth = rightside.split(",")[0];	}
 					if (x == 1) { book = rightside.split(",")[1]; book = book.slice(1, book.length); console.log("book"); }
 					if (x == 1) { console.log("auth/book: "+auth+":"+book); }
 				}
-				if (book.includes("#")) { book = book.slice(0, book.indexOf("#")); book = book.trim() }
-				if (book.includes("-")) { book = book.slice(0, book.indexOf("-")); book = book.trim() }
-				if (book.includes(":")) { book = book.slice(0, book.indexOf(":")); book = book.trim() }
-				console.log("book: '"+book+"'")
-				if (typeof auth !== 'undefined' && typeof book !== 'undefined') {
-					for (var x = 0; x < booklist[0].length; x++) {
+				console.log("auth: '"+auth+"'")
+				if (typeof auth !== 'undefined') { // if auth and book in rightside
+					if (typeof book !== 'undefined') {
+						if (book.includes("#")) { book = book.slice(0, book.indexOf("#")); book = book.trim() }
+						if (book.includes("-")) { book = book.slice(0, book.indexOf("-")); book = book.trim() }
+						if (book.includes(":")) { book = book.slice(0, book.indexOf(":")); book = book.trim() }
+						console.log("book: '"+book+"'")
 						var spaceless = book.replace(/\s/g, '');
 						var underscoredtitle = book.replace(/\s/g, '_');
 						var hyphened = book.replace(/\s/g, '-');
+					} else {
+						var spaceless = "VN7Z"
+						var underscoredtitle = ".txt"
+						var hyphened = "LA81"
+					}
+					authend = ""
+					for (var x = 0; x < booklist[0].length; x++) { // go through booklist []
 						authfront = auth.trim();
 						authfront = authfront.replace(/\s/g, '_');
-						authfront = authfront.split("_")[1];
-						console.log('authfront: "'+authfront+'"')
-						if (booklist[0][x].includes(spaceless) || booklist[0][x].includes(underscoredtitle) || booklist[0][x].includes(hyphened)) {
-								if (booklist[0][x].includes(authfront.toUpperCase())) {
+						authfront = authfront.replace(/ /g, '_');
+						if (authfront.split("_").length == 1) {  console.log("split 1?????") }
+						if (authfront.split("_").length == 2) {	console.log("match2"); authend = authfront.split("_")[1]; }
+						if (authfront.split("_").length == 3) {  authend = authfront.split("_")[2]; }
+			//			console.log('authfront: "'+authfront+'"')
+				//		console.log('authend: "'+authend+'"')
+						if (((typeof book !== "undefined") && (booklist[0][x].includes(spaceless) || booklist[0][x].includes(underscoredtitle) || booklist[0][x].includes(hyphened))) || (typeof book == "undefined")) {
+								console.log("TYPEOF BOOK???: "+typeof book)
+								if (booklist[0][x].includes(authend.toUpperCase())) {
 								 if (booklist[0][x].indexOf("DUPLICATES") == -1) {
 										console.log("found book!: "+booklist[0][x])
 										matchingbooks.push(booklist[0][x])
@@ -394,6 +394,7 @@ function bookFinder(line, xloc) {
 	//							matchingbooks.sort()[0]
 								inBook(matchingbooks.sort()[0], leftside, xloc); 
 					} 
+
 				}
 			}
 	//parse right side for auth, and book.
@@ -410,25 +411,38 @@ function inBook(booklocation, leftside, xloc) {
 		var query = new RegExp(".*", "gim");
 		values = req.responseText.match(query); // values = search results?
 		cleanleft = leftside.replace(/\s/g, ' ');
-		if (cleanleft.split(" ").length > 4) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[1]), cleanleft.indexOf(cleanleft.split(" ")[1])+32); console.log("small space splitted") }
-		if (cleanleft.split(" ").length > 8) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[3]), cleanleft.indexOf(cleanleft.split(" ")[3])+32); console.log("space splitted") } 
+		console.log("cleanleft.length"+cleanleft.length)
+	//	if (cleanleft.split(" ").length > 4) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[1]), cleanleft.indexOf(cleanleft.split(" ")[1])+40); console.log("small space splitted") }
+	//	if (cleanleft.split(" ").length > 8) { cleanleft = cleanleft.slice(cleanleft.indexOf(cleanleft.split(" ")[3]), cleanleft.indexOf(cleanleft.split(" ")[3])+40); console.log("space splitted") } 
 		if (found == 0) {
-			for (s = 0; s < cleanleft.length-1; s++) {
-				if (s == 0) { console.log("s == 0"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
-				if (s == 1) { console.log("s == 1"); cleanslice = cleanleft.slice(1, 20) } 
-				if (s > 1 && s < 6) { console.log("s > 1"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
-				console.log("cleanslice--s: "+cleanslice+"--"+s)
+			for (s = 0; s < Math.min(50,cleanleft.length); s++) {
+					console.log("cleanleft.length"+cleanleft.length)
+				if (s == 0) { console.log("s == 0: cleanslice"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
+				if (s == 1) { console.log("s == 1"); cleanslice = cleanleft.slice(1, cleanleft.length-10) } 
+				if (s % 2 == 0) { console.log("s % 4 == 0"); cleanslice = cleanleft.slice(15+s, 45-s) }
+				if (s % 3 == 0 && cleanslice.length > 40) { console.log("s % 5"); cleanslice = cleanleft.slice(30, cleanleft.length) }
+				if (s > 2 && s < 5) { console.log("s > 1"); cleanslice = cleanleft.slice(s, cleanleft.length-s) }
+				if (s == 6 && cleanleft.length > 30) { console.log("s == 6"); cleanslice = cleanleft.slice(cleanleft.length-20, cleanleft.length-3) }
+				if (s > 7) { console.log("s > 6"); cleanslice = cleanleft.slice((3*s)+s, (4*s+s)+15) }
+				if (s > 15 && s % 3 == 0 && cleanleft.length > 30) { console.log("s > 15"); cleanslice = cleanslice.slice(0, cleanslice.length-5) }
+				if (s > 30) { console.log("s > 30"); cleanslice = cleanleft.slice(Math.min((s - 30)*5, cleanleft.length-10), Math.min(((s-30)*5)+20, cleanleft.length)) }
+				if (cleanslice.length < 12) { cleanslice = cleanleft.slice(s*2, (s*2)+10) }
+				if (cleanslice.length > 30) { cleanslice = cleanslice.slice(0, 30) }
+				console.log("cleanslice--s--len: "+cleanslice+"--"+s+"--"+cleanslice.length)
 					for (var x = 0; x <= values.length; x++) {
 						if (typeof cleanslice === "undefined") { console.log("break, its undefined") }
 						//console.log("typeof cleanslice: "+typeof cleanslice+":"+cleanslice+":"+x)
 						if (x == values.length) { console.log("EOF pre break") } 
 						if (typeof values[x] !== "undefined") { 
-							if (values[x].includes(cleanslice)) {
-								for (var z = -16; z < 16; z++) {
-									if (values[x+z] != "") {
-										if (z != 0) { document.getElementById("demo"+xloc).innerHTML += "<p>"+values[x+z] }
-										if (z == 0) { document.getElementById("demo"+xloc).innerHTML += "<p><b>"+values[x+z]+"</b>" }
-										}
+							if (values[x].includes(cleanslice) && cleanslice.length > Math.min(20, cleanleft.length)) {
+									if (found == 0) {
+										console.log("FOUND::::::CLEANSLICE: + len  "+cleanslice+":::"+cleanslice.length)
+										for (var z = -20; z < 20; z++) {
+											if (values[x+z] != "") {
+												if (z != 0) { document.getElementById("demo"+xloc).innerHTML += "<p>     "+values[x+z] }
+												if (z == 0) { document.getElementById("demo"+xloc).innerHTML += "<p><b>     "+values[x+z]+"</b>" }
+											}
+										}  found = 1;
 									}
 								found = 1;
 								break;
